@@ -21,7 +21,6 @@ if __name__ == "__main__":
         logger.info(f"Extracting dataset to {dataset_paths_data.archive_folder.native}")
         dataset_paths_data.extract_dataset()
 
-    total_num = int(args.number) if args.number else len(df)
     csv_path = getattr(dataset_paths_data.archive_folder, args.subset)
     csv_path_subset = csv_path.with_name(args.subset + "_dance.csv")
     if not csv_path_subset.is_file():
@@ -31,11 +30,13 @@ if __name__ == "__main__":
         df.to_csv(csv_path_subset, index=False)
     else:
         df = pd.read_csv(csv_path_subset)
-        df = df[~df["path"].notnull()].sample(total_num).reset_index(drop=True)
+        df = df[~df["path"].notnull()]
 
     download_folder = dataset_paths_data.native.joinpath(args.subset)
+    total_num = int(args.number) if args.number else len(df)
+    df_subsample = df.sample(total_num)
 
-    for index, row in tqdm(df[:total_num].iterrows(), total=total_num):
+    for index, row in tqdm(df_subsample.iterrows(), total=total_num):
         try:
             youtube_obj = YouTube(YOUTUBE_VIDEO_URL.format(row["youtube_id"]))
             file_path = download_folder.joinpath(youtube_obj.streams.first().default_filename)
