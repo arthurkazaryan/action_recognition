@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import NoReturn
 
@@ -5,6 +6,16 @@ import requests
 import tarfile
 
 from settings import KINETICS_DATASET_URL
+
+logger_formatter = logging.Formatter(f"%(asctime)s | %(levelname)s | %(message)s", "%Y-%m-%d %H:%M:%S")
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(logger_formatter)
+
+logger = logging.getLogger()
+if logger.hasHandlers():
+    logger.handlers.clear()
+logger.addHandler(stream_handler)
+logger.setLevel(logging.INFO)
 
 
 class DatasetPathsData(object):
